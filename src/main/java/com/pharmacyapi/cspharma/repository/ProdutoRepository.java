@@ -1,5 +1,11 @@
 package com.pharmacyapi.cspharma.repository;
 
-public interface ProdutoRepository {
+import java.util.List;
 
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import com.pharmacyapi.cspharma.model.Produto;
+
+public interface ProdutoRepository extends JpaRepository <Produto,Long> {
+	public List<Produto> findAllByNomeContainingIgnoreCase(String nome);
 }
