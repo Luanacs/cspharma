@@ -28,10 +28,9 @@ public class Produto {
 	private String descricao;
 	
 	@NotBlank
-	@Size(min=8,max=10)
+	@Size(min=8,max=100)
 	private String dataValidade;
 	
-	@NotBlank
 	private double preco;
 	
 	@ManyToOne
