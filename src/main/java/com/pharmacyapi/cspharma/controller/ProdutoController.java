@@ -20,8 +20,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.pharmacyapi.cspharma.model.Categoria;
 import com.pharmacyapi.cspharma.model.Produto;
+import com.pharmacyapi.cspharma.repository.CategoriaRepository;
 import com.pharmacyapi.cspharma.repository.ProdutoRepository;
 
 @RestController
@@ -31,6 +31,9 @@ public class ProdutoController {
 	
 	@Autowired
 	private ProdutoRepository repository;
+	
+	@Autowired
+	private CategoriaRepository categoriaRepository;
 	
 	@GetMapping
 	public ResponseEntity <List<Produto> > getAll(){
@@ -48,15 +51,19 @@ public class ProdutoController {
 		return ResponseEntity.ok(repository.findAllByNomeContainingIgnoreCase(nome));
 	}
 	@PostMapping
-	public ResponseEntity<Produto> post(@Valid @RequestBody Produto produtos){
-		return ResponseEntity.status(HttpStatus.CREATED).body(repository.save(produtos));
+	public ResponseEntity<Produto> postProduto (@Valid @RequestBody Produto produto){
+		if (repository.existsById(produto.getCategoria().getId()))
+			return ResponseEntity.status(HttpStatus.CREATED).body(repository.save(produto));
+	     return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
 	}
 	@PutMapping
-	public ResponseEntity<Produto> put(@Valid @RequestBody Produto produtos){
-		return repository.findById(produtos.getId())
-				.map(resposta-> ResponseEntity.status(HttpStatus.OK)
-						.body(repository.save(produtos)))
-				.orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+	public ResponseEntity<Produto> putProduto (@Valid @RequestBody Produto produto){
+		if (repository.existsById(produto.getId())){
+					if (categoriaRepository.existsById(produto.getCategoria().getId()))
+						return ResponseEntity.status(HttpStatus.OK).body(repository.save(produto));
+					return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+					}			
+		return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 	}
 	
 	@ResponseStatus(HttpStatus.NO_CONTENT)
