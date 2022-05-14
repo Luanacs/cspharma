@@ -39,8 +39,9 @@ public class UsuarioController {
 	}
 
 	@GetMapping("/cpf/{cpf}")
-	public ResponseEntity<List<Usuario>> getByCpf(@PathVariable String cpf) {
-		return ResponseEntity.ok(repository.findByCpf(cpf));
+	public ResponseEntity<Usuario> getByCpf(@PathVariable String cpf) {
+		return repository.findByCpf(cpf).map(resp->ResponseEntity.ok(resp))
+				.orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
 	}
 
 }
